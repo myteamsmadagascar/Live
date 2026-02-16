@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CRM – Import Manuel (Firebase)</title>
+<title>CRM â€“ Import Manuel (Firebase)</title>
 
 <style>
   body{font-family:Arial;margin:0;background:#f4f6fb}
@@ -31,7 +31,7 @@
 </head>
 
 <body>
-<header id="hdr">CRM – Import Manuel Firebase</header>
+<header id="hdr">CRM â€“ Import Manuel Firebase</header>
 
 <div class="wrap">
 <button onclick="window.location.href='base.html'">
@@ -55,11 +55,11 @@
   <!-- Actions -->
   <div class="card row">
     <span class="pill">Base : <b id="basePill"></b></span>
-    <span class="pill">Affichés : <b id="shownCount">0</b></span>
+    <span class="pill">AffichÃ©s : <b id="shownCount">0</b></span>
 
     <button class="btn primary" id="btnOpenImport"> Import (mapping)</button>
     <button class="btn" id="btnNew"> Nouveau</button>
-    <button class="btn" id="btnDeleteSelected"> Supprimer sélection</button>
+    <button class="btn" id="btnDeleteSelected"> Supprimer sÃ©lection</button>
     <button class="btn danger" id="btnDeleteAll"> Tout supprimer (admin)</button>
 
     <div style="flex:1"></div>
@@ -80,37 +80,37 @@
           <tr>
             <th style="width:42px"><input id="cbAll" type="checkbox"></th>
             <th>Nom</th>
-            <th>Prénom</th>
+            <th>PrÃ©nom</th>
             <th>Adresse</th>
             <th>Fixe</th>
             <th>Mobile</th>
             <th>RDV le</th>
-            <th>À rappeler le</th>
+            <th>Ã€ rappeler le</th>
             <th>Statut</th>
-            <th>Réponse 1</th>
-            <th>Réponse 2</th>
+            <th>RÃ©ponse 1</th>
+            <th>RÃ©ponse 2</th>
             <th>Commentaire</th>
             <th style="width:120px">Actions</th>
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="13" class="small">Chargement…</td></tr>
+          <tr><td colspan="13" class="small">Chargementâ€¦</td></tr>
         </tbody>
       </table>
     </div>
     <div class="small" style="margin-top:8px">
-      Astuce : on limite l’affichage (100/200/500) pour éviter les plantages sur mobile.
+      Astuce : on limite lâ€™affichage (100/200/500) pour Ã©viter les plantages sur mobile.
     </div>
   </div>
 
   <!-- Import -->
   <div id="importCard" class="card hidden">
-    <b>Import TXT/CSV — Mapping + Validation</b>
-    <div class="small" style="margin-top:6px">Choisir le fichier  Préparer  Mapper  Valider import.</div>
+    <b>Import TXT/CSV â€” Mapping + Validation</b>
+    <div class="small" style="margin-top:6px">Choisir le fichier  PrÃ©parer  Mapper  Valider import.</div>
 
     <div class="row" style="margin-top:10px">
       <input type="file" id="file" accept=".txt,.csv">
-      <button class="btn" id="btnPrepare">Préparer</button>
+      <button class="btn" id="btnPrepare">PrÃ©parer</button>
       <span class="small" id="detect"></span>
     </div>
 
@@ -124,11 +124,11 @@
         <input id="maxImport" type="number" value="5000">
       </div>
       <div>
-        <label class="small">Démarrer à la ligne (0 = 1ère ligne après l’en-tête)</label><br>
+        <label class="small">DÃ©marrer Ã  la ligne (0 = 1Ã¨re ligne aprÃ¨s lâ€™en-tÃªte)</label><br>
         <input id="startRow" type="number" value="0">
       </div>
       <div>
-        <label class="small">Séparateur</label><br>
+        <label class="small">SÃ©parateur</label><br>
         <select id="sep">
           <option value="auto" selected>Auto</option>
           <option value=";">;</option>
@@ -163,24 +163,24 @@
 
     <div class="grid" style="margin-top:10px">
       <div><label class="small">Nom</label><br><input id="f_nom"></div>
-      <div><label class="small">Prénom</label><br><input id="f_prenom"></div>
+      <div><label class="small">PrÃ©nom</label><br><input id="f_prenom"></div>
       <div><label class="small">Adresse</label><br><input id="f_adresse"></div>
       <div><label class="small">Fixe</label><br><input id="f_fixe"></div>
       <div><label class="small">Mobile</label><br><input id="f_mobile"></div>
       <div><label class="small">RDV le</label><br><input id="f_rdv" type="date"></div>
-      <div><label class="small">À rappeler le</label><br><input id="f_rappeler" type="date"></div>
+      <div><label class="small">Ã€ rappeler le</label><br><input id="f_rappeler" type="date"></div>
       <div>
         <label class="small">Statut</label><br>
         <select id="f_statut">
           <option>RDV</option>
-          <option>À rappeler</option>
+          <option>Ã€ rappeler</option>
           <option>Non joint</option>
           <option>Refus</option>
           <option>Hors cible</option>
         </select>
       </div>
-      <div><label class="small">Réponse 1</label><br><input id="f_r1"></div>
-      <div><label class="small">Réponse 2</label><br><input id="f_r2"></div>
+      <div><label class="small">RÃ©ponse 1</label><br><input id="f_r1"></div>
+      <div><label class="small">RÃ©ponse 2</label><br><input id="f_r2"></div>
     </div>
 
     <div style="margin-top:10px">
@@ -216,14 +216,14 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // 1 base = 1 collection (séparée)
+  // 1 base = 1 collection (sÃ©parÃ©e)
   const COL_NAME = `crm_${BASE_ID.toLowerCase()}`;
   const colRef = collection(db, COL_NAME);
 
   /* ====== UI ====== */
   const $ = (id)=>document.getElementById(id);
   $("basePill").textContent = BASE_ID + " (" + COL_NAME + ")";
-  $("hdr").textContent = "CRM – " + BASE_ID + " (Firebase)";
+  $("hdr").textContent = "CRM â€“ " + BASE_ID + " (Firebase)";
 
   const importCard = $("importCard");
   $("btnOpenImport").onclick = ()=> importCard.classList.toggle("hidden");
@@ -249,7 +249,7 @@
       render();
     }, (err)=>{
       console.error(err);
-      $("tbody").innerHTML = `<tr><td colspan="13" class="small">Erreur Firebase. Vérifie HTTPS + règles Firestore.</td></tr>`;
+      $("tbody").innerHTML = `<tr><td colspan="13" class="small">Erreur Firebase. VÃ©rifie HTTPS + rÃ¨gles Firestore.</td></tr>`;
     });
   }
   subscribe();
@@ -271,7 +271,7 @@
 
     const tb = $("tbody");
     if(!VIEW.length){
-      tb.innerHTML = `<tr><td colspan="13" class="small">Aucune donnée.</td></tr>`;
+      tb.innerHTML = `<tr><td colspan="13" class="small">Aucune donnÃ©e.</td></tr>`;
       return;
     }
 
@@ -384,25 +384,25 @@
     try{
       if(EDIT_ID){
         await updateDoc(doc(db, COL_NAME, EDIT_ID), payload);
-        $("modalMsg").textContent = "Modifié ";
+        $("modalMsg").textContent = "ModifiÃ© ";
       } else {
         await addDoc(colRef, { ...payload, createdAt: serverTimestamp() });
-        $("modalMsg").textContent = "Ajouté ";
+        $("modalMsg").textContent = "AjoutÃ© ";
       }
       setTimeout(closeModal, 300);
     }catch(e){
       console.error(e);
-      $("modalMsg").textContent = "Erreur enregistrement (règles Firestore / connexion).";
+      $("modalMsg").textContent = "Erreur enregistrement (rÃ¨gles Firestore / connexion).";
     }
   };
 
   /* ====== Delete selected / delete all ====== */
   $("btnDeleteSelected").onclick = async ()=>{
     const ids = [...document.querySelectorAll(".cbRow:checked")].map(c=>c.dataset.id);
-    if(!ids.length){ alert("Aucune sélection"); return; }
-    if(!confirm("Supprimer la sélection ?")) return;
+    if(!ids.length){ alert("Aucune sÃ©lection"); return; }
+    if(!confirm("Supprimer la sÃ©lection ?")) return;
 
-    // suppression en série (stable)
+    // suppression en sÃ©rie (stable)
     for(const id of ids){
       await deleteDoc(doc(db, COL_NAME, id));
     }
@@ -410,18 +410,18 @@
 
   $("btnDeleteAll").onclick = async ()=>{
     const pass = prompt("Mot de passe admin");
-    if(pass !== ADMIN_PASS){ alert("Refusé"); return; }
+    if(pass !== ADMIN_PASS){ alert("RefusÃ©"); return; }
     if(!confirm("Supprimer TOUTE la base ?")) return;
 
-    // On supprime par lots sur ce qui est actuellement affiché.
-    // Pour vider absolument tout (au-delà de la limite affichée), relance jusqu’à ce qu’il n’y ait plus rien.
+    // On supprime par lots sur ce qui est actuellement affichÃ©.
+    // Pour vider absolument tout (au-delÃ  de la limite affichÃ©e), relance jusquâ€™Ã  ce quâ€™il nâ€™y ait plus rien.
     const snap = await getDocs(query(colRef, qlimit(500)));
     const docs = snap.docs;
-    if(!docs.length){ alert("Base déjà vide"); return; }
+    if(!docs.length){ alert("Base dÃ©jÃ  vide"); return; }
     for(const d of docs){
       await deleteDoc(doc(db, COL_NAME, d.id));
     }
-    alert("Lot supprimé  (relancer si base très grande)");
+    alert("Lot supprimÃ©  (relancer si base trÃ¨s grande)");
   };
 
   /* ====== Import (mapping + validation + batch) ====== */
@@ -432,15 +432,15 @@
 
   const FIELDS = [
     ["nom","Nom"],
-    ["prenom","Prénom"],
+    ["prenom","PrÃ©nom"],
     ["adresse","Adresse"],
     ["fixe","Fixe"],
     ["mobile","Mobile"],
     ["rdv_le","RDV le"],
-    ["a_rappeler_le","À rappeler le"],
+    ["a_rappeler_le","Ã€ rappeler le"],
     ["statut","Statut"],
-    ["reponse1","Réponse 1"],
-    ["reponse2","Réponse 2"],
+    ["reponse1","RÃ©ponse 1"],
+    ["reponse2","RÃ©ponse 2"],
     ["commentaire","Commentaire"]
   ];
 
@@ -461,7 +461,7 @@
     ROWS = RAW_LINES.slice(1);
 
     buildMappingUI();
-    $("detect").textContent = `Lignes détectées : ${ROWS.length} • Colonnes : ${HEADERS.length} • Séparateur : ${sep==="\\t"?"TAB":sep}`;
+    $("detect").textContent = `Lignes dÃ©tectÃ©es : ${ROWS.length} â€¢ Colonnes : ${HEADERS.length} â€¢ SÃ©parateur : ${sep==="\\t"?"TAB":sep}`;
     $("progress").textContent = "";
   };
 
@@ -488,7 +488,7 @@
   }
 
   $("btnValidate").onclick = async ()=>{
-    if(!ROWS.length){ alert("Cliquer sur Préparer d’abord"); return; }
+    if(!ROWS.length){ alert("Cliquer sur PrÃ©parer dâ€™abord"); return; }
 
     // build mapping
     MAP = {};
@@ -512,7 +512,7 @@
     let idx = startRow;
     const endLimit = Math.min(ROWS.length, startRow + maxImport);
 
-    $("progress").textContent = `Import en cours… (${batchSize}/batch)`;
+    $("progress").textContent = `Import en coursâ€¦ (${batchSize}/batch)`;
 
     async function runBatch(){
       const end = Math.min(idx + batchSize, endLimit);
@@ -529,12 +529,12 @@
       }
 
       idx = end;
-      $("progress").textContent = `Importé : ${idx - startRow} / ${endLimit - startRow}`;
+      $("progress").textContent = `ImportÃ© : ${idx - startRow} / ${endLimit - startRow}`;
 
       if(idx < endLimit){
         setTimeout(runBatch, 120); // anti-freeze
       } else {
-        $("progress").textContent += "  terminé";
+        $("progress").textContent += "  terminÃ©";
       }
     }
 
@@ -543,4 +543,5 @@
 </script>
 
 </body>
+
 </html>
