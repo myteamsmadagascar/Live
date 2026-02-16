@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM – Import Manuel (Firebase)</title>
+
+<style>
+  body{font-family:Arial;margin:0;background:#f4f6fb}
+  header{background:#fff;padding:12px;border-bottom:1px solid #ccc;font-weight:700}
+  .wrap{max-width:1400px;margin:auto;padding:12px}
+  .card{background:#fff;border:1px solid #ccc;border-radius:8px;padding:12px;margin-bottom:12px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button,input,select,textarea{padding:8px;font-size:14px}
+  textarea{min-height:70px;width:100%}
+  .btn{border:1px solid #ccc;background:#fff;border-radius:8px;cursor:pointer}
+  .btn.primary{background:#0b57d0;color:#fff;border-color:#0b57d0}
+  .btn.danger{background:#ef4444;color:#fff;border-color:#ef4444}
+  .btn.small{padding:6px 8px;font-size:13px;border-radius:7px}
+  .hidden{display:none}
+  .small{font-size:12px;color:#555}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border:1px solid #ddd;padding:6px;vertical-align:top}
+  th{background:#f1f3f7;position:sticky;top:0;z-index:1}
+  .tableWrap{max-height:62vh;overflow:auto;border:1px solid #ddd;border-radius:8px}
+  .pill{display:inline-block;padding:3px 8px;border:1px solid #ddd;border-radius:999px;font-size:12px}
+  .modalBack{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:12px;z-index:99}
+  .modal{background:#fff;border-radius:10px;max-width:900px;width:100%;border:1px solid #ddd;padding:12px}
+</style>
+</head>
+
+<body>
+<header id="hdr">CRM – Import Manuel Firebase</header>
+
+<div class="wrap">
+<button onclick="window.location.href='base.html'">
+  📁 Base 1
+</button>
+<button onclick="window.location.href='base1.html'">
+  📁 Base 2
+</button>
+<button onclick="window.location.href='base2.html'">
+  📁 Base 3
+</button>
+<button onclick="window.location.href='base3.html'">
+  📁 Base 4
+</button>
+<button onclick="window.location.href='base4.html'">
+  📁 Base 5
+  <button onclick="window.location.href='base5.html'">
+  📁 Base 6
+</button>
+</button>
+  <!-- Actions -->
+  <div class="card row">
+    <span class="pill">Base : <b id="basePill"></b></span>
+    <span class="pill">Affichés : <b id="shownCount">0</b></span>
+
+    <button class="btn primary" id="btnOpenImport">📥 Import (mapping)</button>
+    <button class="btn" id="btnNew">➕ Nouveau</button>
+    <button class="btn" id="btnDeleteSelected">🗑 Supprimer sélection</button>
+    <button class="btn danger" id="btnDeleteAll">🗑 Tout supprimer (admin)</button>
+
+    <div style="flex:1"></div>
+
+    <input id="q" placeholder="Recherche (nom, mobile, statut...)" style="min-width:240px">
+    <select id="limitView">
+      <option value="100">Afficher 100</option>
+      <option value="200" selected>Afficher 200</option>
+      <option value="500">Afficher 500</option>
+    </select>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:42px"><input id="cbAll" type="checkbox"></th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Adresse</th>
+            <th>Fixe</th>
+            <th>Mobile</th>
+            <th>RDV le</th>
+            <th>À rappeler le</th>
+            <th>Statut</th>
+            <th>Réponse 1</th>
+            <th>Réponse 2</th>
+            <th>Commentaire</th>
+            <th style="width:120px">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="13" class="small">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="small" style="margin-top:8px">
+      Astuce : on limite l’affichage (100/200/500) pour éviter les plantages sur mobile.
+    </div>
+  </div>
+
+  <!-- Import -->
+  <div id="importCard" class="card hidden">
+    <b>Import TXT/CSV — Mapping + Validation</b>
+    <div class="small" style="margin-top:6px">Choisir le fichier → Préparer → Mapper → Valider import.</div>
+
+    <div class="row" style="margin-top:10px">
+      <input type="file" id="file" accept=".txt,.csv">
+      <button class="btn" id="btnPrepare">Préparer</button>
+      <span class="small" id="detect"></span>
+    </div>
+
+    <div class="grid" style="margin-top:10px">
+      <div>
+        <label class="small">Batch (ex : 500)</label><br>
+        <input id="batchSize" type="number" value="500">
+      </div>
+      <div>
+        <label class="small">Import total max</label><br>
+        <input id="maxImport" type="number" value="5000">
+      </div>
+      <div>
+        <label class="small">Démarrer à la ligne (0 = 1ère ligne après l’en-tête)</label><br>
+        <input id="startRow" type="number" value="0">
+      </div>
+      <div>
+        <label class="small">Séparateur</label><br>
+        <select id="sep">
+          <option value="auto" selected>Auto</option>
+          <option value=";">;</option>
+          <option value=",">,</option>
+          <option value="\t">Tab</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <b>Mapping des colonnes</b>
+      <div id="mapping" class="grid" style="margin-top:8px"></div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="btnValidate">✅ Valider import</button>
+      <button class="btn" id="btnCloseImport">Fermer</button>
+      <span class="small" id="progress"></span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Edit -->
+<div id="modalBack" class="modalBack">
+  <div class="modal">
+    <div class="row">
+      <b id="modalTitle">Nouveau</b>
+      <div style="flex:1"></div>
+      <button class="btn" id="btnCloseModal">✖</button>
+    </div>
+
+    <div class="grid" style="margin-top:10px">
+      <div><label class="small">Nom</label><br><input id="f_nom"></div>
+      <div><label class="small">Prénom</label><br><input id="f_prenom"></div>
+      <div><label class="small">Adresse</label><br><input id="f_adresse"></div>
+      <div><label class="small">Fixe</label><br><input id="f_fixe"></div>
+      <div><label class="small">Mobile</label><br><input id="f_mobile"></div>
+      <div><label class="small">RDV le</label><br><input id="f_rdv" type="date"></div>
+      <div><label class="small">À rappeler le</label><br><input id="f_rappeler" type="date"></div>
+      <div>
+        <label class="small">Statut</label><br>
+        <select id="f_statut">
+          <option>RDV</option>
+          <option>À rappeler</option>
+          <option>Non joint</option>
+          <option>Refus</option>
+          <option>Hors cible</option>
+        </select>
+      </div>
+      <div><label class="small">Réponse 1</label><br><input id="f_r1"></div>
+      <div><label class="small">Réponse 2</label><br><input id="f_r2"></div>
+    </div>
+
+    <div style="margin-top:10px">
+      <label class="small">Commentaire</label>
+      <textarea id="f_comment"></textarea>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="btnSave">💾 Enregistrer</button>
+      <button class="btn danger hidden" id="btnDeleteOne">🗑 Supprimer</button>
+      <span class="small" id="modalMsg"></span>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, updateDoc, deleteDoc, doc,
+    onSnapshot, query, orderBy, limit as qlimit, serverTimestamp, getDocs
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+  /* ====== CONFIG ====== */
+  const BASE_ID = "BASE_1";                 // BASE_1..BASE_5
+  const ADMIN_PASS = "admin2026";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA-G8P5NokxI6ZaIOMroQrH4x8mp_Q2dgg",
+    authDomain: "axokit-crm-ecoles-e56ab.firebaseapp.com",
+    projectId: "axokit-crm-ecoles-e56ab"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // 1 base = 1 collection (séparée)
+  const COL_NAME = `crm_${BASE_ID.toLowerCase()}`;
+  const colRef = collection(db, COL_NAME);
+
+  /* ====== UI ====== */
+  const $ = (id)=>document.getElementById(id);
+  $("basePill").textContent = BASE_ID + " (" + COL_NAME + ")";
+  $("hdr").textContent = "CRM – " + BASE_ID + " (Firebase)";
+
+  const importCard = $("importCard");
+  $("btnOpenImport").onclick = ()=> importCard.classList.toggle("hidden");
+  $("btnCloseImport").onclick = ()=> importCard.classList.add("hidden");
+
+  /* ====== DATA CACHE (for view only) ====== */
+  let ALL = []; // {id, ...}
+  let VIEW = []; // filtered
+  let currentLimit = parseInt($("limitView").value, 10) || 200;
+
+  $("limitView").onchange = ()=>{
+    currentLimit = parseInt($("limitView").value, 10) || 200;
+    subscribe();
+  };
+  $("q").oninput = ()=> render();
+
+  let unsub = null;
+  function subscribe(){
+    if(unsub) unsub();
+    const q = query(colRef, orderBy("createdAt", "desc"), qlimit(currentLimit));
+    unsub = onSnapshot(q, (snap)=>{
+      ALL = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      render();
+    }, (err)=>{
+      console.error(err);
+      $("tbody").innerHTML = `<tr><td colspan="13" class="small">Erreur Firebase. Vérifie HTTPS + règles Firestore.</td></tr>`;
+    });
+  }
+  subscribe();
+
+  function norm(v){ return (v==null?"":(""+v)).trim(); }
+
+  function render(){
+    const q = norm($("q").value).toLowerCase();
+    VIEW = ALL.filter(x=>{
+      if(!q) return true;
+      const blob = [
+        x.nom,x.prenom,x.adresse,x.fixe,x.mobile,x.rdv_le,x.a_rappeler_le,x.statut,
+        x.reponse1,x.reponse2,x.commentaire
+      ].map(v=>norm(v).toLowerCase()).join(" | ");
+      return blob.includes(q);
+    });
+
+    $("shownCount").textContent = VIEW.length;
+
+    const tb = $("tbody");
+    if(!VIEW.length){
+      tb.innerHTML = `<tr><td colspan="13" class="small">Aucune donnée.</td></tr>`;
+      return;
+    }
+
+    tb.innerHTML = VIEW.map((x, idx)=>`
+      <tr>
+        <td><input class="cbRow" type="checkbox" data-id="${x.id}"></td>
+        <td>${esc(x.nom)}</td>
+        <td>${esc(x.prenom)}</td>
+        <td>${esc(x.adresse)}</td>
+        <td>${esc(x.fixe)}</td>
+        <td>${esc(x.mobile)}</td>
+        <td>${esc(x.rdv_le)}</td>
+        <td>${esc(x.a_rappeler_le)}</td>
+        <td>${esc(x.statut)}</td>
+        <td>${esc(x.reponse1)}</td>
+        <td>${esc(x.reponse2)}</td>
+        <td>${esc(x.commentaire)}</td>
+        <td>
+          <button class="btn small" onclick="window.__edit('${x.id}')">✏️ Modifier</button>
+          <button class="btn danger small" onclick="window.__del('${x.id}')">🗑</button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function esc(s){
+    s = (s==null?"":""+s);
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  $("cbAll").onchange = (e)=>{
+    const v = e.target.checked;
+    document.querySelectorAll(".cbRow").forEach(c=>c.checked=v);
+  };
+
+  /* ====== Modal add/edit ====== */
+  const modalBack = $("modalBack");
+  const openModal = ()=> modalBack.style.display="flex";
+  const closeModal = ()=> modalBack.style.display="none";
+  $("btnCloseModal").onclick = closeModal;
+
+  let EDIT_ID = null;
+
+  $("btnNew").onclick = ()=>{
+    EDIT_ID = null;
+    $("modalTitle").textContent = "Nouveau";
+    $("btnDeleteOne").classList.add("hidden");
+    fillForm({});
+    $("modalMsg").textContent="";
+    openModal();
+  };
+
+  function fillForm(x){
+    $("f_nom").value = x.nom||"";
+    $("f_prenom").value = x.prenom||"";
+    $("f_adresse").value = x.adresse||"";
+    $("f_fixe").value = x.fixe||"";
+    $("f_mobile").value = x.mobile||"";
+    $("f_rdv").value = x.rdv_le||"";
+    $("f_rappeler").value = x.a_rappeler_le||"";
+    $("f_statut").value = x.statut||"RDV";
+    $("f_r1").value = x.reponse1||"";
+    $("f_r2").value = x.reponse2||"";
+    $("f_comment").value = x.commentaire||"";
+  }
+
+  function readForm(){
+    return {
+      nom: norm($("f_nom").value),
+      prenom: norm($("f_prenom").value),
+      adresse: norm($("f_adresse").value),
+      fixe: norm($("f_fixe").value),
+      mobile: norm($("f_mobile").value),
+      rdv_le: $("f_rdv").value || "",
+      a_rappeler_le: $("f_rappeler").value || "",
+      statut: $("f_statut").value || "",
+      reponse1: norm($("f_r1").value),
+      reponse2: norm($("f_r2").value),
+      commentaire: norm($("f_comment").value),
+      updatedAt: serverTimestamp()
+    };
+  }
+
+  window.__edit = (id)=>{
+    const x = ALL.find(z=>z.id===id);
+    if(!x) return;
+    EDIT_ID = id;
+    $("modalTitle").textContent = "Modifier";
+    $("btnDeleteOne").classList.remove("hidden");
+    fillForm(x);
+    $("modalMsg").textContent="";
+    openModal();
+  };
+
+  window.__del = async (id)=>{
+    if(!confirm("Supprimer ?")) return;
+    await deleteDoc(doc(db, COL_NAME, id));
+  };
+
+  $("btnDeleteOne").onclick = async ()=>{
+    if(!EDIT_ID) return;
+    if(!confirm("Supprimer ?")) return;
+    await deleteDoc(doc(db, COL_NAME, EDIT_ID));
+    closeModal();
+  };
+
+  $("btnSave").onclick = async ()=>{
+    $("modalMsg").textContent = "";
+    const payload = readForm();
+    try{
+      if(EDIT_ID){
+        await updateDoc(doc(db, COL_NAME, EDIT_ID), payload);
+        $("modalMsg").textContent = "Modifié ✅";
+      } else {
+        await addDoc(colRef, { ...payload, createdAt: serverTimestamp() });
+        $("modalMsg").textContent = "Ajouté ✅";
+      }
+      setTimeout(closeModal, 300);
+    }catch(e){
+      console.error(e);
+      $("modalMsg").textContent = "Erreur enregistrement (règles Firestore / connexion).";
+    }
+  };
+
+  /* ====== Delete selected / delete all ====== */
+  $("btnDeleteSelected").onclick = async ()=>{
+    const ids = [...document.querySelectorAll(".cbRow:checked")].map(c=>c.dataset.id);
+    if(!ids.length){ alert("Aucune sélection"); return; }
+    if(!confirm("Supprimer la sélection ?")) return;
+
+    // suppression en série (stable)
+    for(const id of ids){
+      await deleteDoc(doc(db, COL_NAME, id));
+    }
+  };
+
+  $("btnDeleteAll").onclick = async ()=>{
+    const pass = prompt("Mot de passe admin");
+    if(pass !== ADMIN_PASS){ alert("Refusé"); return; }
+    if(!confirm("Supprimer TOUTE la base ?")) return;
+
+    // On supprime par lots sur ce qui est actuellement affiché.
+    // Pour vider absolument tout (au-delà de la limite affichée), relance jusqu’à ce qu’il n’y ait plus rien.
+    const snap = await getDocs(query(colRef, qlimit(500)));
+    const docs = snap.docs;
+    if(!docs.length){ alert("Base déjà vide"); return; }
+    for(const d of docs){
+      await deleteDoc(doc(db, COL_NAME, d.id));
+    }
+    alert("Lot supprimé ✅ (relancer si base très grande)");
+  };
+
+  /* ====== Import (mapping + validation + batch) ====== */
+  let RAW_LINES = [];
+  let HEADERS = [];
+  let ROWS = [];
+  let MAP = {};
+
+  const FIELDS = [
+    ["nom","Nom"],
+    ["prenom","Prénom"],
+    ["adresse","Adresse"],
+    ["fixe","Fixe"],
+    ["mobile","Mobile"],
+    ["rdv_le","RDV le"],
+    ["a_rappeler_le","À rappeler le"],
+    ["statut","Statut"],
+    ["reponse1","Réponse 1"],
+    ["reponse2","Réponse 2"],
+    ["commentaire","Commentaire"]
+  ];
+
+  $("btnPrepare").onclick = async ()=>{
+    const f = $("file").files?.[0];
+    if(!f){ alert("Choisir un fichier"); return; }
+
+    const txt = await f.text();
+    RAW_LINES = txt.replace(/\r/g,"").split("\n").filter(l=>l.trim());
+
+    if(RAW_LINES.length < 2){
+      alert("Fichier vide ou invalide");
+      return;
+    }
+
+    const sep = detectSep(RAW_LINES[0]);
+    HEADERS = RAW_LINES[0].split(sep).map(s=>s.trim());
+    ROWS = RAW_LINES.slice(1);
+
+    buildMappingUI();
+    $("detect").textContent = `Lignes détectées : ${ROWS.length} • Colonnes : ${HEADERS.length} • Séparateur : ${sep==="\\t"?"TAB":sep}`;
+    $("progress").textContent = "";
+  };
+
+  function detectSep(line){
+    const forced = $("sep").value;
+    if(forced !== "auto") return forced === "\\t" ? "\t" : forced;
+    if(line.includes(";")) return ";";
+    if(line.includes(",")) return ",";
+    if(line.includes("\t")) return "\t";
+    return ";";
+  }
+
+  function buildMappingUI(){
+    const box = $("mapping");
+    box.innerHTML = "";
+    for(const [k,label] of FIELDS){
+      const sel = document.createElement("select");
+      sel.dataset.field = k;
+      sel.innerHTML =
+        `<option value="">-- ${label} --</option>` +
+        HEADERS.map((h,i)=>`<option value="${i}">${esc(h)}</option>`).join("");
+      box.appendChild(sel);
+    }
+  }
+
+  $("btnValidate").onclick = async ()=>{
+    if(!ROWS.length){ alert("Cliquer sur Préparer d’abord"); return; }
+
+    // build mapping
+    MAP = {};
+    [...$("mapping").querySelectorAll("select")].forEach(sel=>{
+      if(sel.value !== ""){
+        MAP[sel.dataset.field] = parseInt(sel.value,10);
+      }
+    });
+
+    // minimum required
+    if(MAP.nom==null && MAP.mobile==null){
+      alert("Mapper au minimum Nom ou Mobile.");
+      return;
+    }
+
+    const batchSize = Math.max(1, parseInt($("batchSize").value,10) || 500);
+    const maxImport = Math.max(1, parseInt($("maxImport").value,10) || ROWS.length);
+    const startRow  = Math.max(0, parseInt($("startRow").value,10) || 0);
+    const sep = detectSep(RAW_LINES[0]);
+
+    let idx = startRow;
+    const endLimit = Math.min(ROWS.length, startRow + maxImport);
+
+    $("progress").textContent = `Import en cours… (${batchSize}/batch)`;
+
+    async function runBatch(){
+      const end = Math.min(idx + batchSize, endLimit);
+
+      for(let i=idx; i<end; i++){
+        const parts = ROWS[i].split(sep);
+        const obj = {};
+        for(const key in MAP){
+          obj[key] = (parts[MAP[key]] ?? "").trim();
+        }
+        obj.createdAt = serverTimestamp();
+        obj.updatedAt = serverTimestamp();
+        await addDoc(colRef, obj);
+      }
+
+      idx = end;
+      $("progress").textContent = `Importé : ${idx - startRow} / ${endLimit - startRow}`;
+
+      if(idx < endLimit){
+        setTimeout(runBatch, 120); // anti-freeze
+      } else {
+        $("progress").textContent += " ✅ terminé";
+      }
+    }
+
+    runBatch();
+  };
+</script>
+
+</body>
+</html>
